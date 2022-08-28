@@ -1,15 +1,21 @@
 import 'package:fast_barcode_scanner/fast_barcode_scanner.dart';
 import 'package:fast_barcode_scanner_example/scanning_screen/scanning_overlay_config.dart';
 import 'package:flutter/material.dart';
-import '../scan_history.dart';
+
 import '../configure_screen/configure_screen.dart';
+import '../scan_history.dart';
 import '../utils.dart';
 import 'scans_counter.dart';
 
 class ScanningScreen extends StatefulWidget {
-  const ScanningScreen({Key? key, required this.dispose}) : super(key: key);
+  const ScanningScreen({
+    Key? key,
+    required this.dispose,
+    this.apiMode = IOSApiMode.avFoundation,
+  }) : super(key: key);
 
   final bool dispose;
+  final IOSApiMode? apiMode;
 
   @override
   _ScanningScreenState createState() => _ScanningScreenState();
@@ -34,7 +40,12 @@ class _ScanningScreenState extends State<ScanningScreen> {
     ..color = Colors.orange;
 
   ScanningOverlayConfig _scanningOverlayConfig = ScanningOverlayConfig(
-      ScanningOverlayType.values, ScanningOverlayType.codeBoundaryOverlay);
+    availableOverlays: ScanningOverlayType.values,
+    enabledOverlays: [
+      ScanningOverlayType.materialOverlay,
+      ScanningOverlayType.codeBoundaryOverlay,
+    ],
+  );
 
   final cam = CameraController();
 
@@ -88,13 +99,30 @@ class _ScanningScreenState extends State<ScanningScreen> {
         framerate: Framerate.fps30,
         mode: DetectionMode.continuous,
         position: CameraPosition.back,
-        onScan: (code) => history.addAll(code),
+        apiMode: widget.apiMode,
+        onScan: (code) {
+          history.addAll(code);
+        },
         children: [
-          if (_scanningOverlayConfig.enabledOverlay ==
-              ScanningOverlayType.materialOverlay)
-            const MaterialPreviewOverlay(),
-          if (_scanningOverlayConfig.enabledOverlay ==
-              ScanningOverlayType.codeBoundaryOverlay)
+          if (_scanningOverlayConfig.enabledOverlays
+              .contains(ScanningOverlayType.materialOverlay))
+            MaterialPreviewOverlay(
+              rectOfInterest: RectOfInterest.wide(), // this can be wide or square
+              onScan: (codes) {
+                // these are codes that only appear within the finder rectangle
+              },
+              showSensing: true,
+              onScannedBoundaryColorSelector: (codes) {
+                if (codes.isNotEmpty) {
+                  return codes.first.value.hashCode % 2 == 0
+                      ? Colors.orange
+                      : Colors.green;
+                }
+                return null;
+              },
+            ),
+          if (_scanningOverlayConfig.enabledOverlays
+              .contains(ScanningOverlayType.codeBoundaryOverlay))
             CodeBoundaryOverlay(
               codeBorderPaintBuilder: (code) {
                 return code.value.hashCode % 2 == 0 ? orangePaint : greenPaint;
@@ -109,8 +137,8 @@ class _ScanningScreenState extends State<ScanningScreen> {
                 );
               },
             ),
-          if (_scanningOverlayConfig.enabledOverlay ==
-              ScanningOverlayType.blurPreview)
+          if (_scanningOverlayConfig.enabledOverlays
+              .contains(ScanningOverlayType.blurPreview))
             const BlurPreviewOverlay()
         ],
         dispose: widget.dispose,
