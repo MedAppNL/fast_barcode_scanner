@@ -198,7 +198,10 @@ class _CameraController implements CameraController {
   @override
   Future<void> dispose() async {
     try {
-      await _platform.dispose();
+      if (state.isInitialized) {
+        await _platform.dispose();
+      }
+
       state._scannerConfig = null;
       state._previewConfig = null;
       state._torch = false;
