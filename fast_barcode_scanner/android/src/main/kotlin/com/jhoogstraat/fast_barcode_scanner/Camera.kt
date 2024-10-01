@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.Surface
 import androidx.camera.core.*
 import androidx.camera.core.Camera
+import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -14,7 +15,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.common.util.concurrent.ListenableFuture
-import com.google.mlkit.vision.barcode.Barcode
+import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.jhoogstraat.fast_barcode_scanner.scanner.MLKitBarcodeScanner
 import com.jhoogstraat.fast_barcode_scanner.types.*
@@ -199,7 +200,7 @@ class Camera(
         cameraSurfaceProvider = Preview.SurfaceProvider {
             val surfaceTexture = flutterTextureEntry.surfaceTexture()
             surfaceTexture.setDefaultBufferSize(it.resolution.width, it.resolution.height)
-            it.provideSurface(Surface(surfaceTexture), cameraExecutor, {})
+            it.provideSurface(Surface(surfaceTexture), cameraExecutor) {}
         }
 
         // Attach the viewfinder's surface provider to preview use case

@@ -1,5 +1,6 @@
 package com.jhoogstraat.fast_barcode_scanner
 
+import android.util.Log
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -12,7 +13,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.android.gms.tasks.Tasks
-import com.google.mlkit.vision.barcode.Barcode
+import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
@@ -42,7 +43,7 @@ class FastBarcodeScannerPlugin : FlutterPlugin, MethodCallHandler, StreamHandler
     private var pluginBinding: FlutterPlugin.FlutterPluginBinding? = null
     private var activityBinding: ActivityPluginBinding? = null
     private var camera: Camera? = null
-
+    
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         commandChannel = MethodChannel(
             flutterPluginBinding.binaryMessenger,
@@ -89,8 +90,8 @@ class FastBarcodeScannerPlugin : FlutterPlugin, MethodCallHandler, StreamHandler
     }
 
     /* Detections EventChannel */
-    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-        detectionEventSink = events
+    override fun onListen(arguments: Any?, sink: EventChannel.EventSink?) {
+        detectionEventSink = sink
     }
 
     override fun onCancel(arguments: Any?) {
@@ -241,7 +242,7 @@ class FastBarcodeScannerPlugin : FlutterPlugin, MethodCallHandler, StreamHandler
 
                 return pickImageCompleter!!.task.continueWithTask {
                     if (it.result == null) Tasks.forResult(null) else
-                        scanner.process(InputImage.fromFilePath(activityBinding.activity, it.result))
+                        scanner.process(InputImage.fromFilePath(activityBinding.activity, it.result as Uri))
                 }
             }
         }

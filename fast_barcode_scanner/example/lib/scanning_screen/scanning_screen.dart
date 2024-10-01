@@ -1,18 +1,24 @@
 import 'package:fast_barcode_scanner/fast_barcode_scanner.dart';
 import 'package:fast_barcode_scanner_example/scanning_screen/scanning_overlay_config.dart';
 import 'package:flutter/material.dart';
-import '../scan_history.dart';
+
 import '../configure_screen/configure_screen.dart';
+import '../scan_history.dart';
 import '../utils.dart';
 import 'scans_counter.dart';
 
 class ScanningScreen extends StatefulWidget {
-  const ScanningScreen({Key? key, required this.dispose}) : super(key: key);
+  const ScanningScreen({
+    super.key,
+    required this.dispose,
+    // this.appleApiMode = const AppleApiMode.avFoundation(),
+  });
 
   final bool dispose;
+  // final AppleApiMode? appleApiMode;
 
   @override
-  _ScanningScreenState createState() => _ScanningScreenState();
+  State<ScanningScreen> createState() => _ScanningScreenState();
 }
 
 class _ScanningScreenState extends State<ScanningScreen> {
@@ -33,10 +39,15 @@ class _ScanningScreenState extends State<ScanningScreen> {
     ..strokeJoin = StrokeJoin.bevel
     ..color = Colors.orange;
 
-  ScanningOverlayConfig _scanningOverlayConfig =
-      ScanningOverlayConfig(ScanningOverlayType.values, ScanningOverlayType.codeBoundaryOverlay);
+  ScanningOverlayConfig _scanningOverlayConfig = ScanningOverlayConfig(
+    availableOverlays: ScanningOverlayType.values,
+    enabledOverlays: [
+      ScanningOverlayType.materialOverlay,
+      ScanningOverlayType.codeBoundaryOverlay,
+    ],
+  );
 
-  final cam = CameraController();
+  final cam = CameraController.shared;
 
   @override
   Widget build(BuildContext context) {
@@ -86,29 +97,39 @@ class _ScanningScreenState extends State<ScanningScreen> {
         framerate: Framerate.fps30,
         mode: DetectionMode.continuous,
         position: CameraPosition.back,
-        onScan: (code) => history.addAll(code),
-        children: [
-          if (_scanningOverlayConfig.enabledOverlay == ScanningOverlayType.materialOverlay)
-            const MaterialPreviewOverlay(),
-          if (_scanningOverlayConfig.enabledOverlay == ScanningOverlayType.codeBoundaryOverlay)
-            CodeBoundaryOverlay(
-              codeBorderPaintBuilder: (code) {
-                return code.value.hashCode % 2 == 0 ? orangePaint : greenPaint;
-              },
-              // codeValueDisplayBuilder: (code) {
-              //   return BasicBarcodeValueDisplay(
-              //     text: code.value,
-              //     color: code.value.hashCode % 2 == 0
-              //         ? Colors.orange
-              //         : Colors.green,
-              //     location: CodeValueDisplayLocation.centerTop,
-              //   );
-              // },
-            ),
-          if (_scanningOverlayConfig.enabledOverlay == ScanningOverlayType.blurPreview)
-            const BlurPreviewOverlay()
-        ],
+        // appleApiMode: widget.appleApiMode,
+        onScan: (code) {
+          history.addAll(code);
+        },
         dispose: widget.dispose,
+        children: [
+          if (_scanningOverlayConfig.enabledOverlays.contains(ScanningOverlayType.materialOverlay))
+            MaterialPreviewOverlay(
+              rectOfInterest: RectOfInterest.wide(), // this can be wide or square
+              onScan: (codes) {
+                // these are codes that only appear within the finder rectangle
+              },
+              showSensing: true,
+              onScannedBoundsColor: (codes) {
+                if (codes.isNotEmpty) {
+                  return codes.first.value.hashCode % 2 == 0 ? Colors.orange : Colors.green;
+                }
+                return null;
+              },
+            ),
+          // if (_scanningOverlayConfig.enabledOverlays
+          //     .contains(ScanningOverlayType.codeBoundaryOverlay))
+          //   CodeBoundaryOverlay(
+          //     codeBorderPaintBuilder: (code) {
+          //       return code.value.hashCode % 2 == 0 ? orangePaint : greenPaint;
+          //     },
+          //     barcodeValueStyle: (code) => TextStyle(
+          //       color: code.value.hashCode % 2 == 0 ? Colors.orange : Colors.green,
+          //     ),
+          //   ),
+          // if (_scanningOverlayConfig.enabledOverlays.contains(ScanningOverlayType.blurPreview))
+          //   const BlurPreviewOverlay()
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -143,10 +164,14 @@ class _ScanningScreenState extends State<ScanningScreen> {
                                       final future =
                                           isRunning ? cam.pauseCamera() : cam.resumeCamera();
 
-                                      future
-                                          .then((_) => _cameraRunning.value = !isRunning)
-                                          .catchError((error, stack) {
-                                        presentErrorAlert(context, error, stack);
+                                      future.then((_) {
+                                        _cameraRunning.value = !isRunning;
+                                      }).catchError((error, stack) {
+                                        presentErrorAlert(
+                                          context,
+                                          error,
+                                          stack,
+                                        );
                                       });
                                     },
                                     child: Text(isRunning ? 'Pause Camera' : 'Resume Camera'),
@@ -160,10 +185,14 @@ class _ScanningScreenState extends State<ScanningScreen> {
                                       final future =
                                           isRunning ? cam.pauseScanner() : cam.resumeScanner();
 
-                                      future
-                                          .then((_) => _scannerRunning.value = !isRunning)
-                                          .catchError((error, stackTrace) {
-                                        presentErrorAlert(context, error, stackTrace);
+                                      future.then((_) {
+                                        _scannerRunning.value = !isRunning;
+                                      }).catchError((error, stackTrace) {
+                                        presentErrorAlert(
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        );
                                       });
                                     },
                                     child: Text(isRunning ? 'Pause Scanner' : 'Resume Scanner'),
@@ -173,11 +202,14 @@ class _ScanningScreenState extends State<ScanningScreen> {
                               valueListenable: _torchIconState,
                               builder: (context, isTorchActive, _) => ElevatedButton(
                                 onPressed: () {
-                                  cam
-                                      .toggleTorch()
-                                      .then((torchState) => _torchIconState.value = torchState)
-                                      .catchError((error, stackTrace) {
-                                    presentErrorAlert(context, error, stackTrace);
+                                  cam.toggleTorch().then((torchState) {
+                                    _torchIconState.value = torchState;
+                                  }).catchError((error, stackTrace) {
+                                    presentErrorAlert(
+                                      context,
+                                      error,
+                                      stackTrace,
+                                    );
                                   });
                                 },
                                 child: Text('Torch: ${isTorchActive ? 'on' : 'off'}'),

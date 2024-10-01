@@ -1,17 +1,17 @@
 import 'package:fast_barcode_scanner_platform_interface/src/types/image_source.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'method_channel_fast_barcode_scanner.dart';
 import 'types/barcode.dart';
 import 'types/barcode_type.dart';
 import 'types/preview_configuration.dart';
-import 'method_channel_fast_barcode_scanner.dart';
 
 /// Callback handler method for receiving scanned codes.
 typedef OnDetectionHandler = void Function(List<Barcode>);
 
 /// The interface that implementations of fast_barcode_scanner must implement.
 ///
-/// Platform implementations should extend this class rather than implement it as `fast_barcode_scanner`
+/// Platform implementations should extend this class rather than implement it.
 /// Extending this class (using `extends`) ensures that the subclass will get the default implementation, while
 /// platform implementations that `implements` this interface will be broken by newly added
 /// [FastBarcodeScannerPlatform] methods.
@@ -20,8 +20,7 @@ abstract class FastBarcodeScannerPlatform extends PlatformInterface {
 
   static const Object _token = Object();
 
-  static FastBarcodeScannerPlatform _instance =
-      MethodChannelFastBarcodeScanner();
+  static FastBarcodeScannerPlatform _instance = MethodChannelFastBarcodeScanner();
 
   /// The default instance of [FastBarcodeScannerPlatform] to use.
   ///
@@ -37,12 +36,9 @@ abstract class FastBarcodeScannerPlatform extends PlatformInterface {
 
   /// Initializes and starts the native camera interface.
   /// Returns a [PreviewConfiguration] the camera is setup with.
-  Future<PreviewConfiguration> init(
-      List<BarcodeType> types,
-      Resolution resolution,
-      Framerate framerate,
-      DetectionMode detectionMode,
-      CameraPosition position) {
+  Future<PreviewConfiguration> init(List<BarcodeType> types, Resolution resolution,
+      Framerate framerate, DetectionMode detectionMode, CameraPosition position,
+      {ApiMode? apiMode}) {
     throw UnimplementedError('init() has not been implemented');
   }
 

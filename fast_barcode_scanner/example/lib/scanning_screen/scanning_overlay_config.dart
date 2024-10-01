@@ -7,14 +7,18 @@ enum ScanningOverlayType {
 
 class ScanningOverlayConfig {
   final List<ScanningOverlayType> availableOverlays;
-  final ScanningOverlayType? enabledOverlay;
+  final List<ScanningOverlayType> enabledOverlays;
 
-  ScanningOverlayConfig(this.availableOverlays, this.enabledOverlay);
+  ScanningOverlayConfig({
+    required this.availableOverlays,
+    required this.enabledOverlays,
+  });
 
   ScanningOverlayConfig copyWith(
-      {List<ScanningOverlayType>? availableOverlays,
-      ScanningOverlayType? enabledOverlay}) {
-    return ScanningOverlayConfig(availableOverlays ?? this.availableOverlays,
-        enabledOverlay ?? enabledOverlay);
+      {List<ScanningOverlayType>? enabledOverlays}) {
+    return ScanningOverlayConfig(
+      availableOverlays: availableOverlays,
+      enabledOverlays: enabledOverlays ?? this.enabledOverlays,
+    );
   }
 }

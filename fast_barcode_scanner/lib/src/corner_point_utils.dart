@@ -17,11 +17,14 @@ Offset scaleCodeCornerPoint({
   required Size widgetSize,
 }) {
   // The analysis image is usually landscape regardless of the preview orientation
-  final isAnalysisImageLandscape = analysisImageSize.width > analysisImageSize.height;
-  final analysisHeight =
-      isAnalysisImageLandscape ? analysisImageSize.width : analysisImageSize.height; // 640
-  final analysisWidth =
-      isAnalysisImageLandscape ? analysisImageSize.height : analysisImageSize.width; // 480
+  final isAnalysisImageLandscape =
+      analysisImageSize.width > analysisImageSize.height;
+  final analysisHeight = isAnalysisImageLandscape
+      ? analysisImageSize.width
+      : analysisImageSize.height; // 640
+  final analysisWidth = isAnalysisImageLandscape
+      ? analysisImageSize.height
+      : analysisImageSize.width; // 480
 
   // our widget may have any dimension for the preview. The preview image will be scaled towards the longest edge
   double scale = 1;

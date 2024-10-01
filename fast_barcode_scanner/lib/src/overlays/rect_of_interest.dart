@@ -14,7 +14,8 @@ abstract class RectOfInterest {
   static RectOfInterest wide({double horizontalPadding = 45}) =>
       WideRectOfInterest(horizontalPadding: horizontalPadding);
 
-  static RectOfInterest square({required double size}) => SquareRectOfInterest(size: size);
+  static RectOfInterest square({required double size}) =>
+      SquareRectOfInterest(size: size);
 
   Rect rect(Rect previewWidgetRect);
 
@@ -26,7 +27,10 @@ abstract class RectOfInterest {
   }) {
     return (code) {
       if (code.boundingBox != null) {
-        final cornerPoints = [code.boundingBox!.topLeft, code.boundingBox!.bottomRight];
+        final cornerPoints = [
+          code.boundingBox!.topLeft,
+          code.boundingBox!.bottomRight
+        ];
         for (final cornerPoint in cornerPoints) {
           final scaledCornerOffset = scaleCodeCornerPoint(
             cornerPoint: cornerPoint.toOffset(),
@@ -52,7 +56,10 @@ abstract class RectOfInterest {
   }) {
     return codes.where((code) {
       if (code.boundingBox != null) {
-        final cornerPoints = [code.boundingBox!.topLeft, code.boundingBox!.bottomRight];
+        final cornerPoints = [
+          code.boundingBox!.topLeft,
+          code.boundingBox!.bottomRight
+        ];
         for (final cornerPoint in cornerPoints) {
           final scaledCornerOffset = scaleCodeCornerPoint(
             cornerPoint: cornerPoint.toOffset(),
@@ -110,7 +117,9 @@ class SquareRectOfInterest extends RectOfInterest {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SquareRectOfInterest && runtimeType == other.runtimeType && size == other.size;
+      other is SquareRectOfInterest &&
+          runtimeType == other.runtimeType &&
+          size == other.size;
 
   @override
   int get hashCode => size.hashCode;

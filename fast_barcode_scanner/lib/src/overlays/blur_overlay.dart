@@ -5,11 +5,6 @@ import 'package:flutter/material.dart';
 import '../camera_controller.dart';
 import '../types/scanner_event.dart';
 
-/// Blurs the preview when a barcode is detected
-///
-/// NOTICE: Does not work on iOS currently
-/// https://github.com/flutter/flutter/issues/43902
-
 class BlurPreviewOverlay extends StatelessWidget {
   final double blurAmount;
   final Duration duration;
@@ -25,7 +20,7 @@ class BlurPreviewOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: CameraController().events,
+      valueListenable: CameraController.shared.events,
       builder: (context, event, child) {
         return TweenAnimationBuilder(
           tween: Tween(begin: 0.0, end: shouldBlur(event) ? blurAmount : 0.0),
