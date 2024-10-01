@@ -7,12 +7,12 @@ typedef CodeValueDisplayBuilder = CodeValueDisplay? Function(Barcode code);
 
 class CodeBoundaryOverlay extends StatefulWidget {
   final CodeBorderPaintBuilder? codeBorderPaintBuilder;
-  final CodeValueDisplayBuilder? codeValueDisplayBuilder;
+  final TextStyle Function(Barcode)? barcodeValueStyle;
 
   const CodeBoundaryOverlay({
     Key? key,
     this.codeBorderPaintBuilder,
-    this.codeValueDisplayBuilder,
+    this.barcodeValueStyle,
   }) : super(key: key);
 
   @override
@@ -34,7 +34,7 @@ class _CodeBoundaryOverlayState extends State<CodeBoundaryOverlay> {
                 imageSize: analysisSize,
                 barcodes: barcodes,
                 barcodePaintSelector: widget.codeBorderPaintBuilder,
-                textDecorator: widget.codeValueDisplayBuilder,
+                barcodeValueStyle: widget.barcodeValueStyle,
               ),
             );
           } else {
