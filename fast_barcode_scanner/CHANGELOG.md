@@ -1,3 +1,12 @@
+## 2.0.1
+
+- Updating Flutter dependencies to version 3
+- Updating Dart SDK used to version 3.3.4
+- Updating Kotlin version 1.9.23
+- Downgrading Gradle to version 7.4
+- Updating CameraX to version 1.3.4
+- Updating MLKit to version 17.2.0
+
 ## 2.0.0-dev.2
 
 - Analyze still images from binary or native image pickers on iOS and Android
